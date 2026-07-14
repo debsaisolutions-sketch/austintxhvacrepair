@@ -1,0 +1,7 @@
+.vercel
+node_modules
+.env
+.env.local
+_gen-*.js
+_gen-*.json
+suburb-data.json

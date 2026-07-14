@@ -1,0 +1,191 @@
+/* Austin Tx HVAC Repair — visual system shared with Houston TX HVAC
+   Navy + amber heat theme, Oswald headlines, Source Sans 3 body */
+
+:root {
+  --navy: #1a3a52;
+  --navy-mid: #2d5a7b;
+  --amber: #f59e0b;
+  --amber-hover: #d97706;
+  --text: #333;
+  --bg: #f5f5f5;
+  --white: #fff;
+  --muted: #f9fafb;
+  --sky: #f0f9ff;
+  --border: #ddd;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: "Source Sans 3", system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--amber); }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+.sticky-call {
+  position: sticky; top: 0; background: var(--amber); color: var(--white);
+  padding: 12px 16px; text-align: center; font-weight: 700; z-index: 200; font-size: 0.95rem;
+}
+.sticky-call a { color: var(--white); text-decoration: none; }
+.sticky-call a:hover { text-decoration: underline; }
+
+.site-nav { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.08); }
+.site-nav .nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; padding: 14px 0; flex-wrap: wrap;
+}
+.site-nav .brand {
+  color: var(--white); text-decoration: none; font-family: "Oswald", sans-serif;
+  font-weight: 600; font-size: 1.15rem; letter-spacing: 0.02em;
+}
+.site-nav .brand span { color: var(--amber); }
+.nav-links { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; }
+.nav-links a {
+  color: rgba(255,255,255,0.88); text-decoration: none; font-weight: 600; font-size: 0.95rem;
+}
+.nav-links a:hover, .nav-links a[aria-current="page"] { color: var(--amber); }
+.nav-call {
+  display: inline-block; background: var(--amber); color: var(--white) !important;
+  text-decoration: none; font-weight: 700; font-size: 0.9rem; padding: 8px 14px;
+  border-radius: 4px; white-space: nowrap; transition: background 0.2s ease;
+}
+.nav-call:hover { background: var(--amber-hover); color: var(--white) !important; }
+
+.page-hero {
+  background:
+    linear-gradient(135deg, rgba(26,58,82,0.92) 0%, rgba(45,90,123,0.88) 55%, rgba(26,58,82,0.9) 100%),
+    radial-gradient(ellipse at 20% 20%, rgba(245,158,11,0.18), transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(45,90,123,0.5), transparent 45%),
+    linear-gradient(135deg, #1a3a52 0%, #2d5a7b 100%);
+  color: var(--white); padding: 56px 0 64px; text-align: center; position: relative; overflow: hidden;
+}
+.page-hero::after {
+  content: ""; position: absolute; inset: 0;
+  background: repeating-linear-gradient(-12deg, transparent, transparent 14px, rgba(255,255,255,0.015) 14px, rgba(255,255,255,0.015) 15px);
+  pointer-events: none;
+}
+.page-hero .container { position: relative; z-index: 1; }
+.page-hero .brand-mark {
+  font-family: "Oswald", sans-serif; font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700; letter-spacing: 0.02em; margin-bottom: 12px; line-height: 1.1;
+}
+.page-hero .brand-mark span { color: var(--amber); }
+.page-hero h1 {
+  font-family: "Oswald", sans-serif; font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 500; margin-bottom: 12px; opacity: 0.98;
+}
+.page-hero .lede { font-size: 1.1rem; max-width: 640px; margin: 0 auto 12px; opacity: 0.95; }
+.page-hero .phone { font-size: 1.25rem; font-weight: 700; color: var(--amber); margin: 10px 0 4px; }
+
+.cta-button {
+  display: inline-block; background: var(--amber); color: var(--white); padding: 14px 36px;
+  border-radius: 5px; text-decoration: none; font-weight: 700; margin-top: 18px;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+.cta-button:hover { background: var(--amber-hover); transform: translateY(-1px); }
+.cta-button.secondary {
+  background: transparent; border: 2px solid rgba(255,255,255,0.75); margin-left: 10px;
+}
+.cta-button.secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--white); }
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+
+section, .content-block {
+  background: var(--white); margin: 28px 0; padding: 36px 32px; border-radius: 8px; box-shadow: var(--shadow);
+}
+h2 {
+  font-size: clamp(1.55rem, 3vw, 2rem); margin-bottom: 16px; color: var(--navy);
+  font-family: "Oswald", sans-serif; font-weight: 600;
+}
+h3 {
+  font-size: 1.25rem; margin-top: 18px; margin-bottom: 8px; color: var(--navy-mid);
+  font-family: "Oswald", sans-serif; font-weight: 500;
+}
+p + p { margin-top: 12px; }
+ul.check-list { margin: 12px 0 0 22px; line-height: 2; }
+
+.services {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 18px;
+}
+.service-card {
+  background: var(--muted); padding: 20px; border-left: 4px solid var(--amber); border-radius: 4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.service-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.service-card h3, .service-card h4 {
+  color: var(--navy); margin: 0 0 10px; font-family: "Oswald", sans-serif; font-size: 1.15rem; font-weight: 600;
+}
+.service-card a { color: var(--navy); text-decoration: none; font-weight: 700; }
+.service-card a:hover { color: var(--amber-hover); }
+
+.feature-links {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 18px;
+}
+.feature-link {
+  background: var(--sky); padding: 20px; border-radius: 6px; text-decoration: none; color: var(--navy);
+  transition: transform 0.2s ease, box-shadow 0.2s ease; display: block;
+}
+.feature-link:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.feature-link h3, .feature-link h4 {
+  color: var(--amber); margin: 0 0 8px; font-family: "Oswald", sans-serif;
+}
+
+form.lead-form {
+  background: var(--muted); padding: 28px; border-radius: 8px; max-width: 520px; margin: 18px auto 0;
+}
+form.lead-form label { display: block; font-weight: 600; font-size: 0.9rem; margin-top: 8px; color: var(--navy); }
+form.lead-form input, form.lead-form textarea, form.lead-form select {
+  width: 100%; padding: 12px; margin: 6px 0 10px; border: 1px solid var(--border);
+  border-radius: 4px; font-family: inherit; font-size: 1rem;
+}
+form.lead-form button {
+  background: var(--amber); color: var(--white); padding: 14px 28px; border: none; border-radius: 4px;
+  font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 6px;
+}
+form.lead-form button:hover { background: var(--amber-hover); }
+
+.local-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; margin-top: 12px; }
+@media (max-width: 800px) {
+  .local-grid { grid-template-columns: 1fr; }
+  .cta-button.secondary { margin-left: 0; }
+}
+.aside-box {
+  background: var(--sky); padding: 20px; border-radius: 6px; border-top: 3px solid var(--amber);
+}
+.aside-box h3 { margin-top: 0; color: var(--navy); }
+.aside-box ul { margin: 10px 0 0 18px; line-height: 1.85; }
+.breadcrumb { font-size: 0.9rem; margin-bottom: 12px; color: #666; }
+.breadcrumb a { color: var(--navy-mid); text-decoration: none; }
+.breadcrumb a:hover { color: var(--amber-hover); }
+
+.site-footer { background: var(--navy); color: var(--white); padding: 40px 0 28px; margin-top: 40px; }
+.site-footer a { color: var(--amber); text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+.footer-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 28px; text-align: left; margin-bottom: 28px;
+}
+.footer-grid h3 { color: var(--amber); margin: 0 0 12px; font-size: 1.05rem; }
+.footer-grid ul { list-style: none; line-height: 1.9; }
+.footer-grid p { opacity: 0.92; font-size: 0.95rem; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.12); padding-top: 18px; text-align: center; font-size: 0.9rem; opacity: 0.9;
+}
+.footer-bottom p + p { margin-top: 8px; }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-hero .brand-mark, .page-hero h1, .page-hero .lede, .page-hero .cta-row { animation: fade-up 0.55s ease both; }
+.page-hero h1 { animation-delay: 0.08s; }
+.page-hero .lede { animation-delay: 0.14s; }
+.page-hero .cta-row { animation-delay: 0.22s; }
+@media (prefers-reduced-motion: reduce) {
+  .page-hero .brand-mark, .page-hero h1, .page-hero .lede, .page-hero .cta-row,
+  .service-card, .feature-link, .cta-button { animation: none; transition: none; }
+}
