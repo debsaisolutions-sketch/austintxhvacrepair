@@ -1,5 +1,9 @@
 {
   "name": "austintxhvacrepair",
   "private": true,
-  "description": "Austin Tx HVAC Repair static lead site"
+  "description": "Austin Tx HVAC Repair static lead site",
+  "scripts": {
+    "check": "node scripts/check-forms.js",
+    "test": "node scripts/test-leads.js"
+  }
 }
