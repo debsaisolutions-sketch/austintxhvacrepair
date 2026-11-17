@@ -64,6 +64,7 @@ async function main() {
       email: 'ada@example.com',
       service: 'AC repair',
       area: 'Round Rock',
+      details: 'Thermostat blank',
       message: 'Unit is not cooling',
     },
     {
@@ -82,25 +83,67 @@ async function main() {
   assert.strictEqual(payload.utm_source, 'google');
   assert.strictEqual(payload.utm_medium, 'cpc');
   assert.strictEqual(payload.utm_campaign, 'austin-ac');
+  assert.strictEqual(payload.service, 'AC repair');
+  assert.strictEqual(payload.town, 'Round Rock');
+  assert.strictEqual(payload.details, 'Thermostat blank');
+  assert.strictEqual(payload.referrer, undefined);
   assert.ok(payload.message.indexOf('Service: AC repair') !== -1);
   assert.ok(payload.message.indexOf('Area: Round Rock') !== -1);
+  assert.ok(payload.message.indexOf('Thermostat blank') !== -1);
   assert.ok(payload.message.indexOf('Unit is not cooling') !== -1);
   assert.strictEqual(payload.company_website, undefined);
+
+  global.document = { referrer: 'https://www.google.com/search?q=austin+ac' };
+  const withReferrer = leads.buildPayload(
+    {
+      name: 'Ada Lovelace',
+      service: 'AC repair',
+      area: 'Kyle',
+      details: 'No cool air upstairs',
+      message: 'Unit is not cooling',
+    },
+    {}
+  );
+  assert.strictEqual(withReferrer.service, 'AC repair');
+  assert.strictEqual(withReferrer.town, 'Kyle');
+  assert.strictEqual(withReferrer.details, 'No cool air upstairs');
+  assert.strictEqual(withReferrer.referrer, 'https://www.google.com/search?q=austin+ac');
+  assert.ok(withReferrer.message.indexOf('Service: AC repair') !== -1);
+  assert.ok(withReferrer.message.indexOf('Area: Kyle') !== -1);
+  assert.ok(withReferrer.message.indexOf('No cool air upstairs') !== -1);
+  assert.ok(withReferrer.message.indexOf('Unit is not cooling') !== -1);
+  delete global.document;
 
   const sparse = leads.buildPayload({ name: 'Grace', message: 'Need heat' }, { landing_url: 'https://austintxhvacrepair.com/' });
   assert.strictEqual(sparse.phone, undefined);
   assert.strictEqual(sparse.email, undefined);
+  assert.strictEqual(sparse.service, undefined);
+  assert.strictEqual(sparse.town, undefined);
+  assert.strictEqual(sparse.details, undefined);
+  assert.strictEqual(sparse.referrer, undefined);
   assert.strictEqual(sparse.message, 'Need heat');
   assert.ok(!/Service:|Area:/.test(sparse.message));
 
   assert.strictEqual(leads.shouldDrop('http://spam.test', 9000), true);
-  assert.strictEqual(leads.shouldDrop('', 2999), true);
-  assert.strictEqual(leads.shouldDrop('   ', 4000), false);
+  assert.strictEqual(leads.shouldDrop('', 2999), false);
+  assert.strictEqual(leads.shouldDrop('   ', 1), false);
   assert.strictEqual(leads.shouldDrop('', 3000), false);
+  assert.strictEqual(leads.shouldDrop('', 0), false);
 
+  assert.strictEqual(leads.messageForResult({ status: 201, data: { saved: true } }).ok, true);
+  assert.strictEqual(leads.messageForResult({ status: 201, data: { saved: true } }).text, leads.SUCCESS_TEXT);
+  assert.strictEqual(leads.messageForResult({ status: 200, data: { saved: true, success: true } }).ok, true);
   assert.strictEqual(leads.messageForResult({ status: 201 }).ok, true);
-  assert.strictEqual(leads.messageForResult({ status: 202 }).ok, true);
-  assert.ok(!/filter/i.test(leads.messageForResult({ status: 202 }).text));
+  const notSaved = leads.messageForResult({ status: 201, data: { saved: false } });
+  assert.strictEqual(notSaved.ok, false);
+  assert.ok(notSaved.text.includes(leads.PHONE_FALLBACK));
+  const notSuccess = leads.messageForResult({ status: 200, data: { success: false, saved: true } });
+  assert.strictEqual(notSuccess.ok, false);
+  assert.ok(notSuccess.text.includes(leads.PHONE_FALLBACK));
+  const accepted = leads.messageForResult({ status: 202, data: { saved: true, filtered: true } });
+  assert.strictEqual(accepted.ok, false);
+  assert.ok(accepted.text.includes(leads.PHONE_FALLBACK));
+  assert.ok(!/filter/i.test(accepted.text));
   for (const status of [403, 429, 500, 0]) {
     const msg = leads.messageForResult({ status: status });
     assert.strictEqual(msg.ok, false);
@@ -171,12 +214,12 @@ async function main() {
     message: 'buy now',
     company_website: 'https://spam.example',
   });
-  leads.setLoadedAt(Date.now() - 8000);
+  leads.setLoadedAt(Date.now());
   leads.wireForm(spam.form);
   let fetchCalls = 0;
   global.fetch = async () => {
     fetchCalls += 1;
-    return jsonResponse(201, {});
+    return jsonResponse(201, { saved: true });
   };
   await spam.listeners.submit({ preventDefault() {} });
   assert.strictEqual(fetchCalls, 0);
@@ -186,13 +229,30 @@ async function main() {
     name: 'Speedy',
     phone: '7373726333',
     email: 's@example.com',
+    service: 'AC repair',
+    area: 'Round Rock',
+    details: 'Just opened the page',
     message: 'hello',
     company_website: '',
   });
   leads.setLoadedAt(Date.now());
   leads.wireForm(fast.form);
+  let fastBody = null;
+  global.fetch = async (url, init) => {
+    fetchCalls += 1;
+    fastBody = JSON.parse(init.body);
+    return jsonResponse(201, { saved: true });
+  };
   await fast.listeners.submit({ preventDefault() {} });
-  assert.strictEqual(fetchCalls, 0);
+  assert.strictEqual(fetchCalls, 1);
+  assert.strictEqual(fastBody.name, 'Speedy');
+  assert.strictEqual(fastBody.service, 'AC repair');
+  assert.strictEqual(fastBody.town, 'Round Rock');
+  assert.strictEqual(fastBody.details, 'Just opened the page');
+  assert.ok(fastBody.message.indexOf('hello') !== -1);
+  assert.strictEqual(fast.form._status.textContent, leads.SUCCESS_TEXT);
+  assert.ok(fast.form._status.className.indexOf('is-success') !== -1);
+  assert.strictEqual(fast.form.resetCount, 1);
 
   const denied = makeForm({
     name: 'Ada Lovelace',
@@ -255,9 +315,28 @@ async function main() {
     return jsonResponse(202, { filtered: true });
   };
   await filtered.listeners.submit({ preventDefault() {} });
-  assert.strictEqual(filtered.form._status.textContent, leads.SUCCESS_TEXT);
+  assert.ok(filtered.form._status.textContent.includes(leads.PHONE_FALLBACK));
+  assert.ok(filtered.form._status.className.indexOf('is-error') !== -1);
+  assert.strictEqual(filtered.form.resetCount, 0);
+  assert.strictEqual(posted.service, 'Maintenance');
   assert.ok(posted.message.indexOf('Service: Maintenance') === 0);
   assert.ok(posted.message.indexOf('Tune up') !== -1);
+
+  const unsaved = makeForm({
+    name: 'Ada Lovelace',
+    phone: '7373726333',
+    email: 'ada@example.com',
+    message: 'Need service',
+    company_website: '',
+  });
+  leads.setLoadedAt(Date.now() - 4000);
+  leads.wireForm(unsaved.form);
+  global.fetch = async () => jsonResponse(201, { saved: false });
+  await unsaved.listeners.submit({ preventDefault() {} });
+  assert.ok(unsaved.form._status.textContent.includes(leads.PHONE_FALLBACK));
+  assert.ok(unsaved.form._status.className.indexOf('is-error') !== -1);
+  assert.notStrictEqual(unsaved.form._status.textContent, leads.SUCCESS_TEXT);
+  assert.strictEqual(unsaved.form.resetCount, 0);
 
   console.log('Lead form tests passed (mocked fetch, no live post).');
 }

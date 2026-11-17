@@ -7,7 +7,6 @@
   var PROFILE_ID = '63e7470e-fe1e-4367-aae0-56d0d6392d78';
   var SOURCE = 'austintxhvacrepair.com';
   var PHONE_FALLBACK = '(737) 372-6333';
-  var MIN_FILL_MS = 3000;
   var SUCCESS_TEXT = "Request received. We'll be in touch soon.";
   var loadedAt = Date.now();
 
@@ -83,6 +82,9 @@
     };
     if (fields.phone) body.phone = fields.phone;
     if (fields.email) body.email = fields.email;
+    if (fields.service) body.service = fields.service;
+    if (fields.area) body.town = fields.area;
+    if (fields.details) body.details = fields.details;
     var message = buildMessage(fields);
     if (message) body.message = message;
     if (ctx.landing_url) body.landing_url = ctx.landing_url;
@@ -91,6 +93,13 @@
     for (var i = 0; i < utmKeys.length; i++) {
       if (ctx[utmKeys[i]]) body[utmKeys[i]] = ctx[utmKeys[i]];
     }
+    var referrer = '';
+    try {
+      if (typeof document !== 'undefined' && document.referrer) {
+        referrer = String(document.referrer).trim();
+      }
+    } catch (e3) {}
+    if (referrer) body.referrer = referrer;
     return body;
   }
 
@@ -106,15 +115,16 @@
 
   function messageForResult(result) {
     var status = result && result.status;
-    if (status === 201 || status === 202 || (status >= 200 && status < 300)) {
+    var data = (result && result.data) || {};
+    if ((status === 200 || status === 201) && data.saved !== false && data.success !== false) {
       return { ok: true, text: SUCCESS_TEXT };
     }
     return { ok: false, text: friendlyError(status) };
   }
 
-  function shouldDrop(companyWebsite, elapsedMs) {
+  // Elapsed time is ignored. A filled honeypot is the only client-side drop.
+  function shouldDrop(companyWebsite) {
     if (companyWebsite && String(companyWebsite).trim()) return true;
-    if (elapsedMs < MIN_FILL_MS) return true;
     return false;
   }
 
@@ -177,7 +187,7 @@
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
       var fields = readFields(form);
-      if (shouldDrop(fields.company_website, Date.now() - loadedAt)) {
+      if (shouldDrop(fields.company_website)) {
         showStatus(form, SUCCESS_TEXT, true);
         form.reset();
         return;
