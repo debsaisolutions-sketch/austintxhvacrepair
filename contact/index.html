@@ -68,7 +68,16 @@
             <input id="email" type="email" name="email" required />
             <label for="phone">Phone</label>
             <input id="phone" type="tel" name="phone" required />
-            <label for="area">Service area</label>
+            <label for="service">Service</label>
+            <select id="service" name="service" required>
+              <option value="">Select a service</option>
+              <option value="AC repair">AC repair</option>
+              <option value="Furnace / heating repair">Furnace / heating repair</option>
+              <option value="Maintenance">Maintenance</option>
+              <option value="New system installation">New system installation</option>
+              <option value="Other">Other</option>
+            </select>
+            <label for="area">Town or service area</label>
             <select id="area" name="area">
               <option value="">Select an area</option>
               <option>Round Rock</option>
@@ -84,6 +93,8 @@
               <option>Manor</option>
               <option>Other Greater Austin</option>
             </select>
+            <label for="town_zip">ZIP <span style="font-weight:400;">(optional)</span></label>
+            <input id="town_zip" type="text" name="town_zip" inputmode="numeric" autocomplete="postal-code" maxlength="10" />
             <label for="message">Message</label>
             <textarea id="message" name="message" rows="5" required></textarea>
             <button type="submit">Request Free Estimate</button>
