@@ -79,6 +79,12 @@ for (const file of files) {
     if (!text.includes('name="company_website"')) {
       errors.push(rel + ' has a form but no company_website honeypot');
     }
+    if (text.includes('lead-form') && !text.includes('name="service"')) {
+      errors.push(rel + ' has a lead form but no service field');
+    }
+    if (text.includes('lead-form') && !/name="(?:town_zip|town|zip|area)"/.test(text)) {
+      errors.push(rel + ' has a lead form but no town or ZIP field');
+    }
   }
 
   if (ext === '.html') {
